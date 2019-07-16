@@ -37,7 +37,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
         if parsed_path.path == '/locations':
             parsed_qs = parse_qs(parsed_path.query)
             query = parsed_qs
-            url = f'https://maps.googleapis.com/maps/api/geocode/json?address={query}&key={GEOCODE_API_KEY}'
+            url = f'https://maps.googleapis.com/maps/api/geocode/json?address={query}&key={os.getenv(GEOCODE_API_KEY)'}
             print('url', url)
 
 
