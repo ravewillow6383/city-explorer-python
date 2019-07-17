@@ -3,66 +3,72 @@ from urllib.parse import urlparse, parse_qs
 import os
 import json
 import requests
-
+from flask import Flask
 from dotenv import load_dotenv
+from location import Location
+from weather import Forecast
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    data = Location.fetch()
+
+from dotenv import load dotenv
 load_dotenv()
 
-
-class Location:
-    def __init__(self, url, query):
-        self.search_query = query
-        self.get_location = (url)
-    
-    def get_location(self, url):
-        result = request.get(url).json()
-        self.formatted_query = result['results'][0]['formatted_address']
-        self.latitude = result['results'][0]['geometry']['location']['lat']
-        self.latitude = result['results'][0]['geometry']['location']['lng']
-
-    def serialize(self):
-        return vars(self)
+from locations import Location
+from weather import Forecast
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-# get request must have this name:
+# get request must have this name (BaseHTTPRequestHandler):
     def do_GET(self):
 
         parsed_path = urlparse(self.path)
-        # 200 means its all good
-        self.send_response(200)
-        # need to set which type of content we are sending
-        self.send_header('Content-type', 'application/json')
-        # when done adding header you you must call end
-        self.end_headers()
+        parsed_qs = parse_qs(parsed_path.query)
         
-        if parsed_path.path == '/locations':
-            parsed_qs = parse_qs(parsed_path.query)
-            query = parsed_qs
-            url = f'https://maps.googleapis.com/maps/api/geocode/json?address={query}&key={os.getenv(GEOCODE_API_KEY)'}
-            print('url', url)
-
-
-            result = requests.get(url).json()
+        if parsed_path.path == '/location' and parsed_qs.get('data'):
             
-            formatted_query = result['results'][0]['formatted_address']
+            self.do_json_response()
+            location_query = parsed_qs.get('data')[0]
+            json_string = Location.fetch(location_query)
+            self.wfile.write(json_string.encode())
 
-            print('fq', formatted_query)
-
-            self.wfile.write(b'tbd')
             return
 
-        self.send_response_only(404)
-        self.end_headers()
+        elif parsed_path.path == '/weather':
+
+            self.do_json_response()
+            latitude = parsed_qs['data[latitude]'][0]
+            latitude = parsed_qs['data[longitude]'][0]
+            json_string = Forecast.fetch(latitude, longitude)
+            self.wfile.write(json_string.encode())
+
+            return
+
+            self.send_response_only(404)
+            self.end_headers()
+
+        def do_json_response(self):
+            # 200 means its all good
+            self.send_response(200)
+            # need to set which type of content we are sending
+            self.send_header('Content-type', 'application/json')
+            # when done adding header you you must call end
+            self.end_headers()
+
 
 def create_server():
     return HTTPServer(
         ('127.0.0.1', 3000), SimpleHTTPRequestHandler
+        # must match the name given to class on line 23
     )
 
 def run_forever():
     server = create_server()
 
     try: 
-        print(f'Starting server on port {os.getenv('PORT')}')
+        print('starting on port {}'.format(os.environ['PORT']))
         server.serve_forever()
 
     except KeyboardInterrupt:
