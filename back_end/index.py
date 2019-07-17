@@ -5,20 +5,39 @@ import json
 import requests
 from flask import Flask
 from dotenv import load_dotenv
-from location import Location
+from locations import Location
 from weather import Forecast
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app)
 
-@app.route('/')
-def home():
-    data = Location.fetch()
+@app.route('/location')
+def flask_location():
+    return Location.fetch('Seattle')
 
-from dotenv import load dotenv
+@app.route('/weather')
+def flask_weather():
+    latitude = request.args['data[latitude]']
+    longitude = request.args['data[longitude]']
+    return Forecast.fetch(latitude, longitude)
+
+from dotenv import load_dotenv
 load_dotenv()
 
 from locations import Location
 from weather import Forecast
+
+app = Flask(__name__)
+CORS(app)
+
+@app.route('/')
+def location():
+    print(request.args.get('data'))
+    data=Location.fetch('barcelona')
+
+    return data
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 # get request must have this name (BaseHTTPRequestHandler):
