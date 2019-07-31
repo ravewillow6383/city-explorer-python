@@ -1,6 +1,7 @@
 from os import environ
 import json
 import requests
+from flask import jsonify
 
 class Location:
     def __init__(self, search_query, info):
@@ -29,4 +30,4 @@ class Location:
 
         location = Location(query, locations['results'][0])
         
-        return json.dumps(location.serialize())
+        return location

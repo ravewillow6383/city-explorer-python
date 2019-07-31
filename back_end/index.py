@@ -3,31 +3,12 @@ from urllib.parse import urlparse, parse_qs
 import os
 import json
 import requests
-from flask import Flask
 from dotenv import load_dotenv
 from locations import Location
 from weather import Forecast
-from flask_cors import CORS
-
-
-app = Flask(__name__)
-CORS(app)
-
-@app.route('/location')
-def flask_location():
-    return Location.fetch('Seattle')
-
-@app.route('/weather')
-def flask_weather():
-    latitude = request.args['data[latitude]']
-    longitude = request.args['data[longitude]']
-    return Forecast.fetch(latitude, longitude)
 
 from dotenv import load_dotenv
 load_dotenv()
-
-from locations import Location
-from weather import Forecast
 
 app = Flask(__name__)
 CORS(app)
@@ -55,11 +36,11 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
 
             return
 
-        elif parsed_path.path == '/weather':
+        elif parsed_path.path == '/weather' and parsed_qs.get('data'):
 
             self.do_json_response()
             latitude = parsed_qs['data[latitude]'][0]
-            latitude = parsed_qs['data[longitude]'][0]
+            longitude = parsed_qs['data[longitude]'][0]
             json_string = Forecast.fetch(latitude, longitude)
             self.wfile.write(json_string.encode())
 
