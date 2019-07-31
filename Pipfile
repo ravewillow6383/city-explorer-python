@@ -6,10 +6,13 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-dotenv = "*"
-python = "*"
 requests = "*"
 python-dotenv = "*"
+flask = "*"
+flask-cors = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+gunicorn = "*"
 
 [requires]
 python_version = "3.7"
