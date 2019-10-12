@@ -1,6 +1,5 @@
 # city-explorer-python
 
-# game-of-greed
 **Author**: Raven W. Robertson
 **Version**: 1.0.0 (increment the patch/fix version number up if you make more commits past your first submission)
 
